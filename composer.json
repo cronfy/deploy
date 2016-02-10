@@ -1,0 +1,14 @@
+{
+    "name": "cronfy/deploy",
+    "description": "Tool for local deploying",
+    "require": {
+        "deployer/deployer": "^3.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Cronfy",
+            "email": "cronfy@gmail.com"
+        }
+    ]
+}
