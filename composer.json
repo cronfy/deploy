@@ -10,5 +10,10 @@
             "name": "Cronfy",
             "email": "cronfy@gmail.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "Deploy\\": "src/"
+        }
+    }
 }
