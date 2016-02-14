@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+BASE_DIR="`realpath $0`"
+BASE_DIR="`dirname "$BASE_DIR"`/.."
+
+function skel() {
+    local target="$1"
+
+    [ -z "$target" ] && [ ! -d "$target" ] && return 1 # fail
+
+    SKEL="$BASE_DIR/src/cdep/skel"
+
+    rsync -r --ignore-existing "$SKEL/" "$target/"
+
+    cd $target
+    
+    mkdir -p deploy tmp log var
+
+    [ ! -e public_html ] && [ ! -L public_html ] && ln -s deploy/current/web public_html
+    [ ! -e project ]     && [ ! -L project ]     && ln -s deploy/current project
+
+    true
+
+}
+
+
+while [[ $# > 0 ]]
+do
+key="$1"
+
+case $key in
+    skel)
+    TARGET_DIR="$2"
+
+    [ ! -d "$TARGET_DIR" ] && echo "Please specify target dir" >&2 && exit 1
+
+    skel "$TARGET_DIR"
+
+    status=$?
+    [ 0 != $status ] && echo "Fail" >&2
+    exit $status
+
+    shift # past argument
+    ;;
+    *)
+        echo "Unknown command" >&2
+        exit 1
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+
+echo "Commands: skel"
+

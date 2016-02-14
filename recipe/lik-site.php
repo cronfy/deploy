@@ -5,6 +5,50 @@ require 'recipe/composer.php';
 // defaults
 env('cron', false);
 
+set('symlinks',
+	[ 
+		'web/.htaccess' => '{{ project_root }}/config/.htaccess',
+		'config/app-config-local.php' => '{{ project_root }}/config/app-config-local.php',
+		'web/UserFiles' => '{{ project_root }}/var/UserFiles',
+		'log' => '{{ project_root }}/log',
+		'tmp' => '{{ project_root }}/tmp',
+	] 
+);
+
+// functions
+
+function registerSymlink($from, $to) {
+	if (!has('symlinks')) {
+        $symlinks = []; // no data
+    } else {
+        $symlinks = get('symlinks');
+    }
+
+    $symlinks[$from] = $to;
+    set('symlinks', $symlinks);
+}
+
+function injectLikTasks() {
+    // вставляем наши таски в таски recipe/composer.php
+
+    before('deploy', 'lik:check-not-committed');
+    #task('deploy', [
+    #    'deploy:prepare',
+    #    'deploy:release',
+    #    'deploy:update_code',
+    before('deploy:vendors', 'lik:warm-vendor');
+    #    'deploy:vendors',
+    before('deploy:symlink', 'lik:install-symlinks');
+    #    'deploy:symlink',
+    #    'cleanup',
+    #])->desc('Deploy your project');
+    after('deploy', 'lik:clear-apc-cache');
+    after('deploy', 'lik:install-cron');
+    #
+    #after('deploy', 'success');
+}
+
+
 // tasks
 
 task('lik:clear-apc-cache', function () {
@@ -86,4 +130,5 @@ task('lik:check-not-committed', function() {
     }
 })->desc('Check not committed/pushed changes in all git repos');
 
+injectLikTasks();
 
