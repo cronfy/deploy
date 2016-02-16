@@ -31,6 +31,9 @@ function registerSymlink($from, $to) {
 function injectLikTasks() {
     // вставляем наши таски в таски recipe/composer.php
 
+    //
+    // deploy
+    //
     before('deploy', 'lik:check-not-committed');
     #task('deploy', [
     #    'deploy:prepare',
@@ -46,8 +49,19 @@ function injectLikTasks() {
     after('deploy', 'lik:install-cron');
     #
     #after('deploy', 'success');
+
+
+    //
+    // rollback
+    //
+    before('rollback', 'lik:check-not-committed');
 }
 
+function dirExists($dir) {
+    $result = (string) run("[ -d '$dir' ] && echo 1 || echo ''");
+
+    return (bool) $result;
+}
 
 // tasks
 
@@ -57,7 +71,7 @@ task('lik:clear-apc-cache', function () {
 
 task('lik:warm-vendor', function() {
     // скопировать vendor с последнего релиза
-    run("[ -e {{ deploy_path }}/current/vendor ] && cp -a {{ deploy_path }}/current/vendor {{ deploy_path }}/release");
+    run("[ -e {{ deploy_path }}/current/vendor ] && cp -a {{ deploy_path }}/current/vendor {{ deploy_path }}/release || echo 'No previous vendor, nothing to do'");
 })->desc('Copy vendor from current release');
 
 
@@ -83,6 +97,10 @@ task('lik:install-symlinks', function () {
 })->desc('Install symlinks');
 
 task('lik:check-not-committed', function() {
+    if (!dirExists("{{ deploy_path }}/current")) {
+        return true; // nothing to do
+    }
+
     $repos = (string) run("cd {{ deploy_path }}/current && find ./ -type d -name .git");
     $repos = explode("\n", $repos);
     $changes = array();
