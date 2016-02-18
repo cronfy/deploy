@@ -6,6 +6,7 @@ require 'recipe/composer.php';
 env('cron', false);
 env('branch', 'master');
 env('apc_cache_url', false);
+env('apc_kill_httpd_on_failure', false);
 env('project_root', dirname(dirname($deployFile))); // deploy.php по умолчанию в project_root/config
 env('deploy_path', '{{ project_root }}/deploy');
 
@@ -84,7 +85,19 @@ function hasUncommitted($dir) {
 
 task('lik:clear-apc-cache', function () {
     if (!env('apc_cache_url')) return null;
-	run('wget --user={{ apc.user }} --password={{ apc.password }} --spider {{ apc_cache_url }}');
+    $wget = 'wget --user={{ apc.user }} --password={{ apc.password }} --spider {{ apc_cache_url }}';
+    if (env('apc_kill_httpd_on_failure')) {
+        // если по каким-то причинам не удается сбросить кеш
+        // (например, обновление сайта сломало этот кеш и теперь везде ошибка 500)
+        // просто прибьем апач.
+        $res = (string) run("$wget || echo FAIL");
+        if ($res == "FAIL") {
+            writeln("<comment>Failed to clear APC cache, killing apache instead.</comment>");
+            run("killall httpd");
+        }
+    } else {
+        run("$wget");
+    }
 })->desc('Clear APC cache');
 
 task('lik:warm-vendor', function() {
