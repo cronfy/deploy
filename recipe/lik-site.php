@@ -4,6 +4,10 @@ require 'recipe/composer.php';
 
 // defaults
 env('cron', false);
+env('branch', 'master');
+env('apc_cache_url', false);
+env('project_root', dirname(dirname($deployFile))); // deploy.php по умолчанию в project_root/config
+env('deploy_path', '{{ project_root }}/deploy');
 
 set('symlinks',
 	[ 
@@ -79,6 +83,7 @@ function hasUncommitted($dir) {
 // tasks
 
 task('lik:clear-apc-cache', function () {
+    if (!env('apc_cache_url')) return null;
 	run('wget --user={{ apc.user }} --password={{ apc.password }} --spider {{ apc_cache_url }}');
 })->desc('Clear APC cache');
 
