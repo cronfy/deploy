@@ -1,10 +1,7 @@
 <?php
 
-Deploy\Deploy::init();
+Deploy\Deploy::init(); require 'recipe/lik-site.php';
 
-require 'recipe/lik-site.php';
-
-// this server
 set('repository', '~/repo/....');
 
 localServer('prod');
@@ -13,4 +10,6 @@ localServer('prod');
 #    ->env('apc.password', 'cachepass')
 ;
 
+# symlink example
+# registerSymlink('web/.htaccess', '{{ project_root }}/config/.htaccess.dev');
 
