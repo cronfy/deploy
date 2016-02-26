@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 require 'recipe/composer.php';
 
 // defaults
@@ -47,6 +49,7 @@ function injectLikTasks() {
     before('deploy:vendors', 'lik:warm-vendor');
     #    'deploy:vendors',
     before('deploy:symlink', 'lik:install-symlinks');
+    after('lik:install-symlinks', 'lik:migrate');
     #    'deploy:symlink',
     #    'cleanup',
     #])->desc('Deploy your project');
@@ -82,6 +85,13 @@ function hasUncommitted($dir) {
 }
 
 // tasks
+
+task('lik:migrate', function() {
+    $verbosity = output()->getVerbosity();
+    output()->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+    run('cd {{ deploy_path }}/release && ./yii migrate --interactive=0');
+    output()->setVerbosity($verbosity);
+})->desc('apply yii migrations');
 
 task('lik:clear-apc-cache', function () {
     if (!env('apc_cache_url')) return null;
