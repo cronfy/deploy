@@ -23,24 +23,118 @@ function skel() {
 
 }
 
+function findProjectRootAbove() {
+    local path="$PWD" c=0
+    while [ "/" != "$path" ] ; do
+        [ -L "$path/project" ] && {
+            echo "$path/project"
+            return 0
+        }
+
+        c=$(($c + 1))
+        [ 50 -lt "$c" ] && {
+            echo "Too deep recursion." >&2
+            return 1
+        }
+
+        path="`dirname "$path"`"
+    done
+
+    return 1
+}
+
+function getMysqlArgs() {
+    local project_root="$1"
+	local config mysql_args
+
+	config="`find $project_root/config  -name 'app-config-local.php' -print -quit`"
+
+	[ -z "$config" ] && {
+		return 1
+	}
+
+    mysql_args="`php "$BASE_DIR/bin/get-mysql-args.php" "$config"`"
+
+	if [ "$?" != 0 ] ; then
+		echo "Failed to get mysql settings from $config" >&2
+		return 1
+	fi
+
+	echo "$mysql_args"
+}
+
+function my() {
+    local project_root mysql_args
+
+    project_root="`findProjectRootAbove`"
+    if [ "$?" != 0 ] ; then
+        echo "project root not found" >&2
+        return 1
+    fi
+
+    mysql_args="`getMysqlArgs "$project_root" `"
+    if [ "$?" != 0 ] ; then
+        echo "Failed to get mysql args" >&2
+        return 1
+    fi
+
+    mysql -s -t $mysql_args "$@"
+}
+
+function myd() {
+    local project_root mysql_args
+
+    project_root="`findProjectRootAbove`"
+    if [ "$?" != 0 ] ; then
+        echo "project root not found" >&2
+        return 1
+    fi
+
+    mysql_args="`getMysqlArgs "$project_root" `"
+    if [ "$?" != 0 ] ; then
+        echo "Failed to get mysql args" >&2
+        return 1
+    fi
+
+    mysqldump $mysql_args "$@"
+}
+
 
 while [[ $# > 0 ]]
 do
 key="$1"
 
 case $key in
+    my)
+        shift
+        my "$@"
+        exit $?
+    ;;
+    myd)
+        shift
+        myd "$@"
+        exit $?
+    ;;
+    root)
+        if findProjectRootAbove ; then
+            exit 0
+        else
+            echo "Not found" >&2
+            exit 1
+        fi
+    ;;
     skel)
-    TARGET_DIR="$2"
+        TARGET_DIR="$2"
 
-    [ ! -d "$TARGET_DIR" ] && echo "Please specify target dir" >&2 && exit 1
+        [ ! -d "$TARGET_DIR" ] && echo "Please specify target dir" >&2 && exit 1
 
-    skel "$TARGET_DIR"
+        skel "$TARGET_DIR"
 
-    status=$?
-    [ 0 != $status ] && echo "Fail" >&2
-    exit $status
+        status=$?
+        [ 0 != $status ] && echo "Fail" >&2
+        exit $status
 
-    shift # past argument
+        shift # past argument
     ;;
     *)
         echo "Unknown command" >&2
@@ -52,5 +146,4 @@ shift # past argument or value
 done
 
 
-echo "Commands: skel"
-
+echo "Commands: skel my myd"
