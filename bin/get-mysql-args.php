@@ -12,5 +12,5 @@ function error($no, $str) {
 
 $config = $argv[1];
 include "$config"; 
-echo "-u $config_db_user -p$config_db_password $config_db_name";
+echo "-u $config_db_user -h $config_db_host -p$config_db_password $config_db_name";
 
