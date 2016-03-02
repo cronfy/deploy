@@ -157,8 +157,12 @@ task('lik:check-not-committed', function() {
         $output = run("cd $repo_path && git log --branches --not --remotes --oneline --simplify-by-decoration --decorate");
         $output = (string) $output;
         if ($output) {
-            $changes[$repo_path] = [ 'type' => 'push', 'msg' => $output ];
-            continue;
+            $last_commit_hash = (string) run("cd $repo_path && git rev-parse HEAD");
+            $pushed = (string) run("cd $repo_path && test -e commit.pushed.$last_commit_hash && echo YES || echo NO");
+            if ('YES' !== $pushed) {
+                $changes[$repo_path] = [ 'type' => 'push', 'msg' => $output ];
+                continue;
+            }
         }
     }
 
@@ -219,7 +223,20 @@ task('lik:commit', function() {
     }
 
     run("git commit -a -m " . escapeshellarg($desc));
-//    run("git commit push");
+
+    // push via copy of repo
+    $hash = (string) run("git rev-parse HEAD");
+    run("mkdir -p {{ deploy_path }}/tmp");
+    run("cp -a {{ deploy_path }}/current/ {{deploy_path}}/tmp/$hash");
+    cd("{{deploy_path}}/tmp/$hash");
+    $hash2 = (string) run("git rev-parse HEAD");
+    if ($hash2 !== $hash) {
+        throw new Exception('New commit appeared while copying!');
+    }
+    run("git pull --rebase");
+    run("git push");
+    run("touch {{deploy_path}}/current/commit.pushed.$hash");
+    run("rm -rf {{deploy_path}}/tmp/$hash");
 
     writeln("\n<info>Коммит отправлен в репозиторий.</info>");
 })->desc('Commit changes in working dir');
