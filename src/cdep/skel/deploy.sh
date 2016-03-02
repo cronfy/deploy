@@ -2,5 +2,5 @@
 
 cd "`dirname $0`/config"
 
-dep deploy
+dep deploy "$@"
 

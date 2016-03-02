@@ -2,5 +2,5 @@
 
 cd "`dirname $0`/config"
 
-dep lik:commit
+dep lik:commit "$@"
 
