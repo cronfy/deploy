@@ -222,6 +222,7 @@ task('lik:commit', function() {
         throw new Exception('Коммит не подтвержден.');
     }
 
+    run("git add .");
     run("git commit -a -m " . escapeshellarg($desc));
 
     // push via copy of repo
