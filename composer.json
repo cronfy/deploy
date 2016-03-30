@@ -2,7 +2,7 @@
     "name": "cronfy/deploy",
     "description": "Tool for local deploying",
     "require": {
-        "deployer/deployer": "@dev"
+        "deployer/deployer": "^3.1"
     },
     "license": "MIT",
     "authors": [
