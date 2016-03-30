@@ -99,18 +99,28 @@ function myd() {
     mysqldump $mysql_args "$@"
 }
 
+function initDep() {
+	if [ -e "$HOME/bin/dep" ] ; then
+		dep self-update
+	else
+		cd $HOME/bin
+		wget -O dep http://deployer.org/deployer.phar
+		chmod +x dep
+	fi
+}
+
 
 while [[ $# > 0 ]]
 do
 key="$1"
 
 case $key in
-    my)
+    my|m)
         shift
         my "$@"
         exit $?
     ;;
-    myd)
+    myd|md)
         shift
         myd "$@"
         exit $?
@@ -123,6 +133,10 @@ case $key in
             exit 1
         fi
     ;;
+    init-dep)
+	initDep
+	exit $?
+	;;
     skel)
         TARGET_DIR="$2"
 

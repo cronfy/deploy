@@ -1,6 +1,6 @@
 <?php
 
-Deploy\Deploy::init(); require 'recipe/lik-site.php';
+require getenv('HOME') . '/.composer/vendor/cronfy/deploy/recipe/lik-site.php';
 
 set('repository', '~/repo/....');
 
