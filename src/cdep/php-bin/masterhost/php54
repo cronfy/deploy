@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+/usr/bin/php54 -n -c $HOME/bin/php54.ini -d memory_limit=256M "$@"
+

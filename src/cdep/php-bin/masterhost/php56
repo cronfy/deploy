@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/usr/bin/php56 -n -c $HOME/bin/php56.ini -d memory_limit=256M "$@"
+

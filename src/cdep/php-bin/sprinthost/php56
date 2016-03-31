@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+eval LD_LIBRARY_PATH="/usr/jails/php56_2/lib:/usr/jails/php56_2/usr/local/lib" /usr/jails/php56_2/usr/local/bin/php -n -c $HOME/bin/php56.ini -d "extension_dir=/usr/jails/php56_2/usr/local/lib/php/extension_dir" "$@"
+
