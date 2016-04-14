@@ -78,7 +78,12 @@ function my() {
         return 1
     fi
 
-    mysql -s -t $mysql_args "$@"
+    if [ "$1" = "--" ] ; then
+        shift
+        mysql $mysql_args "$@"
+    else
+        mysql -s -t $mysql_args "$@"
+    fi
 }
 
 function myd() {
