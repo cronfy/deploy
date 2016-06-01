@@ -3,6 +3,34 @@
 BASE_DIR="`realpath $0`"
 BASE_DIR="`dirname "$BASE_DIR"`/.."
 
+function ver() {
+    project_root="`findProjectRootAbove`"
+    if [ "$?" != 0 ] ; then
+        echo "project root not found" >&2
+        return 1
+    fi
+
+    cd "$project_root"
+
+    # http://stackoverflow.com/a/3278427/1775065
+    git remote update
+
+    LOCAL=$(git rev-parse @)
+    REMOTE=$(git rev-parse @{u})
+    BASE=$(git merge-base @ @{u})
+
+    if [ $LOCAL = $REMOTE ]; then
+        echo "Up-to-date"
+    elif [ $LOCAL = $BASE ]; then
+        echo "Need to pull"
+    elif [ $REMOTE = $BASE ]; then
+        echo "Need to push"
+    else
+        echo "Diverged"
+    fi
+}
+
+
 function skel() {
     local target="$1"
 
@@ -120,6 +148,11 @@ do
 key="$1"
 
 case $key in
+    ver)
+        shift
+        ver "$@"
+        exit $?
+    ;;
     my|m)
         shift
         my "$@"
