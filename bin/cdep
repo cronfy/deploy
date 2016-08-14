@@ -54,7 +54,7 @@ function skel() {
 function findProjectRootAbove() {
     local path="$PWD" c=0
     while [ "/" != "$path" ] ; do
-        [ -L "$path/project" ] && {
+        [ -L "$path/project" ] || [ -d "$path/project" ] && {
             echo "$path/project"
             return 0
         }
@@ -76,6 +76,10 @@ function getMysqlArgs() {
 	local config mysql_args
 
 	config="`find $project_root/config  -name 'app-config-local.php' -print -quit`"
+
+	[ -z "$config" ] && {
+        config="`find $project_root/../config  -name 'app-config-local.php' -print -quit`"
+	}
 
 	[ -z "$config" ] && {
 		return 1
