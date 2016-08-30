@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-BASE_DIR="`realpath $0`"
-BASE_DIR="`dirname "$BASE_DIR"`/.."
+SCRIPTPATH=$(readlink -f $0)
+BASE_DIR="`dirname "$SCRIPTPATH"`/.."
 
 function ver() {
     project_root="`findProjectRootAbove`"
@@ -110,11 +110,16 @@ function my() {
         return 1
     fi
 
+    add_args="-s -t"
     if [ "$1" = "--" ] ; then
         shift
-        mysql $mysql_args "$@"
+	add_args=""
+    fi
+
+    if [ "$1" = "=" ] ; then
+	echo mysql $add_args $mysql_args "$@"
     else
-        mysql -s -t $mysql_args "$@"
+	mysql $add_args $mysql_args "$@"
     fi
 }
 
