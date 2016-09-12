@@ -22,12 +22,13 @@ Use kickstart installer.
 wget https://raw.githubusercontent.com/cronfy/deploy/master/doc/kickstart.sh
 chmod +x kickstart.sh
 ./kiskstart.sh
+rm ./kickstart.sh
 
 # update PATH
 . ~/.bash_profile
 ```
 
-What ```kiskstart.sh``` does:
+What ```kickstart.sh``` does:
 
  1. Ensures that ```$HOME/bin/php``` version is 5.6 and ```$HOME/bin``` is in ```$PATH```.
  2. Installs ```composer``` to ```$HOME/bin```.
