@@ -21,7 +21,7 @@ Use kickstart installer.
 ```sh
 wget https://raw.githubusercontent.com/cronfy/deploy/master/doc/kickstart.sh
 chmod +x kickstart.sh
-./kiskstart.sh
+./kickstart.sh
 rm ./kickstart.sh
 
 # update PATH
