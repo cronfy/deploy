@@ -151,6 +151,38 @@ function initDep() {
 	fi
 }
 
+function initComposerToken() {
+	token="`composer config -g github-oauth.github.com`"
+	[ -n "$token" ] && {
+		echo "Token already installed, aborting."
+		return 1
+	}
+
+	echo "\nGo to the link below and: "
+	echo
+	echo " 1. DISABLE ALL checkboxes (give no access)"
+	echo " 2. Create a token and paste it below."
+	echo
+	echo "The link: https://github.com/settings/tokens/new?scopes=repo&description=Composer+for+${USER}@`hostname -f`+`date +%Y-%m-%d`"
+
+	read -p "Token: " token
+	[ -z "$token" ] && { echo "Aborted"; return 1; }
+
+	echo "Installing token $token"
+	composer config -g github-oauth.github.com "$token"
+}
+
+function initYii() {
+	# http://www.yiiframework.com/doc-2.0/guide-start-installation.html#installing-via-composer
+	# there - scroll down to "Installing Yii"
+	composer global require "fxp/composer-asset-plugin:^1.2.0"
+}
+
+function initGit() {
+	# http://stackoverflow.com/questions/13148066/warning-push-default-is-unset-its-implicit-value-is-changing-in-git-2-0
+	git config --global push.default simple
+}
+
 
 while [[ $# > 0 ]]
 do
@@ -188,6 +220,19 @@ case $key in
     ;;
     init-dep)
 	initDep
+	exit $?
+	;;
+    init-yii)
+	initYii
+	exit $?
+	;;
+    init-git)
+	initGit
+	exit $?
+	;;
+    init-composer-token)
+	# helps to install composer token
+	initComposerToken
 	exit $?
 	;;
     skel)

@@ -34,3 +34,16 @@ What ```kickstart.sh``` does:
  2. Installs ```composer``` to ```$HOME/bin```.
  3. Installs ```cdep``` and ensures ```$HOME/.composer/vendor/bin``` is in ```$PATH```.
 
+Initialization
+--------------
+
+Initializations for specific cases.
+
+## Global initializations (not related to project(s))
+
+```sh
+cdep init-composer-token
+cdep init-git
+cdep init-yii
+```
+
