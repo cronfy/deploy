@@ -4,14 +4,32 @@ Local deploy tool
 Installation
 ------------
 
+## If ```composer``` already installed and ```php``` version is 5.6
+
 ```sh
 composer global config repositories.cronfy/deploy vcs https://github.com/cronfy/deploy
 composer global require cronfy/deploy dev-master
+
+# if not yet
+echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bash_profile
 ```
 
-Edit `~/.profile`:
+## No ```composer``` and ```PHP 5.6```
 
+Use kickstart installer.
+
+```sh
+wget https://raw.githubusercontent.com/cronfy/deploy/master/doc/kickstart.sh
+chmod +x kickstart.sh
+./kiskstart.sh
+
+# update PATH
+. ~/.bash_profile
 ```
-PATH=$HOME/.composer/vendor/bin:$PATH
-export PATH
-```
+
+What ```kiskstart.sh` does:
+
+ 1. Ensures that ```$HOME/bin/php``` version is 5.6 and ```$HOME/bin``` is in ```$PATH```.
+ 2. Installs ```composer``` to ```$HOME/bin```.
+ 3. Installs ```cdep``` and ensures ```$HOME/.composer/vendor/bin``` is in ```$PATH```.
+
