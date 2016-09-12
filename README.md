@@ -27,7 +27,7 @@ chmod +x kickstart.sh
 . ~/.bash_profile
 ```
 
-What ```kiskstart.sh` does:
+What ```kiskstart.sh``` does:
 
  1. Ensures that ```$HOME/bin/php``` version is 5.6 and ```$HOME/bin``` is in ```$PATH```.
  2. Installs ```composer``` to ```$HOME/bin```.
