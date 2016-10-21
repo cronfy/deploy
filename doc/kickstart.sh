@@ -35,6 +35,10 @@ check_cdep_version() {
 
 cd
 
+which git || {
+	echo "ERROR: Git is not installed, please install it." >&2
+	exit 1
+}
 
 mkdir -p bin
 if [ -e bin/php ] ; then
@@ -47,12 +51,12 @@ if [ -e bin/php ] ; then
 
         echo "PHP already instaled..."
 else
-        php=`which php56`
+        php=`which php56 || which php5.6`
         if [ -z "$php" ] ; then
                 echo "ERROR: PHP 5.6 not found on server."
                 exit 1
         fi
-        if [ ! `check_php_version "$php"` ] ; then
+        if ! check_php_version "$php" ; then
                 $php -v
                 echo
                 echo "ERROR: Not supported php 5.6 version installed on server at $php"
@@ -101,7 +105,8 @@ else
 fi
 
 composer=$HOME/bin/composer
-cdep=$HOME/.composer/vendor/bin/cdep
+composer_home="`$composer config --global home`"
+cdep="$composer_home/vendor/bin/cdep"
 
 if [ -e "$cdep" ] ; then
     if ! check_cdep_version $cdep ; then
@@ -128,7 +133,7 @@ fi
 
 if [ "`which cdep`" != "$cdep" ] ; then
     echo "Updating PATH environment variable for composer/vendor/bin..."
-    echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bash_profile
+    echo "export PATH=\"$composer_home/vendor/bin:\$PATH\"" >> ~/.bash_profile
 else
     echo "PATH environment variable for composer/vendor/bin is ok..."
 fi
