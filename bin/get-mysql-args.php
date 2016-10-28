@@ -11,6 +11,10 @@ function error($no, $str) {
 //set_error_handler("error"); 
 
 $config = $argv[1];
-include "$config"; 
+include "$config";
+if (!isset($config_db_host)) {
+	$config_db_host = 'localhost';
+} 
+
 echo "-u $config_db_user -h $config_db_host -p$config_db_password $config_db_name";
 

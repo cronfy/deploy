@@ -54,7 +54,7 @@ function skel() {
 function findProjectRootAbove() {
     local path="$PWD" c=0
     while [ "/" != "$path" ] ; do
-        [ -L "$path/project" ] || [ -d "$path/project" ] && {
+        [ -d "$path/project" ] && [ -d "$path/config" ] && [ -f "$path/config/app-config-local.php"  ] && {
             echo "$path/project"
             return 0
         }
@@ -183,6 +183,9 @@ function initGit() {
 	git config --global push.default simple
 }
 
+function goToProject() {
+    true
+}
 
 while [[ $# > 0 ]]
 do
