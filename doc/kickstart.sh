@@ -33,6 +33,25 @@ check_cdep_version() {
         return 1
 }
 
+composer_install() {
+	local EXPECTED_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig)
+	$php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+	local ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');")
+
+	if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]
+	then
+		>&2 echo 'ERROR: Invalid installer signature'
+		rm composer-setup.php
+		return 1
+	fi
+
+	php composer-setup.php
+	RESULT=$?
+	rm composer-setup.php
+	return $RESULT
+
+}
+
 cd
 
 which git || {
@@ -87,12 +106,9 @@ if [ -e bin/composer ] ; then
         echo "Composer already instaled..."
 else
     echo "Installing composer..."
-
     rm -f composer-setup.php
-    $php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    $php -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-    $php composer-setup.php
-    $php -r "unlink('composer-setup.php');"
+	composer_install
+
     mv composer.phar bin/composer
     chmod +x bin/composer
 
