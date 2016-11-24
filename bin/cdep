@@ -146,7 +146,7 @@ function initDep() {
 		dep self-update
 	else
 		cd $HOME/bin
-		wget -O dep http://deployer.org/deployer.phar
+		wget -O dep http://deployer.org/releases/v3.3.0/deployer.phar
 		chmod +x dep
 	fi
 }
@@ -261,4 +261,4 @@ shift # past argument or value
 done
 
 
-echo "Commands: skel my myd"
+echo "Commands: skel my myd init-dep init-git init-yii init-composer-token"
