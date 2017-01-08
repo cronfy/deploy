@@ -16,7 +16,7 @@ check_composer_version() {
         # global php
         local composer="$1"
 
-        if $php $composer --version | head -n 1 | grep '^Composer version 1.2\.' ; then
+        if $php $composer --version | head -n 1 | grep '^Composer version 1\.[23]\.' ; then
                 return 0
         fi
 
