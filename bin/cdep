@@ -183,6 +183,10 @@ function initGit() {
 	git config --global push.default simple
 }
 
+function initBitbucket() {
+	ssh bitbucket.org
+}
+
 function goToProject() {
     true
 }
@@ -233,6 +237,10 @@ case $key in
 	initGit
 	exit $?
 	;;
+    init-bitbucket)
+	initBitbucket
+	exit $?
+	;;
     init-composer-token)
 	# helps to install composer token
 	initComposerToken
@@ -261,4 +269,4 @@ shift # past argument or value
 done
 
 
-echo "Commands: skel my myd init-dep init-git init-yii init-composer-token"
+echo "Commands: skel my myd init-dep init-git init-bitbucket init-yii init-composer-token"
