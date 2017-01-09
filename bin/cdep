@@ -71,9 +71,27 @@ function findProjectRootAbove() {
     return 1
 }
 
+function getMysqlArgsFromDotEnv() {
+	local dotenv="$1"
+
+	(
+		. $dotenv
+		echo "-u $DB_USER -h $DB_HOST -p$DB_PASS $DB_NAME"
+	)
+}
+
 function getMysqlArgs() {
     local project_root="$1"
 	local config mysql_args
+
+	config="`find $project_root/../config  -name '.env' -print -quit`"
+	if [ -n "$config" ] ; then
+		mysql_args=`getMysqlArgsFromDotEnv $config`
+		if [ "$?" = 0 ] ; then
+			echo $mysql_args
+			return 0
+		fi
+	fi
 
 	config="`find $project_root/config  -name 'app-config-local.php' -print -quit`"
 
