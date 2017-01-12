@@ -85,6 +85,9 @@ function getMysqlArgs() {
 	local config mysql_args
 
 	config="`find $project_root/../config  -name '.env' -print -quit`"
+	if [ -z "$config" ] ; then
+		config="`find $project_root/ -maxdepth 1 -mindepth 1 -name '.env' -print -quit`"
+	fi
 	if [ -n "$config" ] ; then
 		mysql_args=`getMysqlArgsFromDotEnv $config`
 		if [ "$?" = 0 ] ; then
