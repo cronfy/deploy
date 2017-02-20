@@ -54,7 +54,12 @@ function skel() {
 function findProjectRootAbove() {
     local path="$PWD" c=0
     while [ "/" != "$path" ] ; do
-        [ -d "$path/project" ] && [ -d "$path/config" ] && [ -f "$path/config/app-config-local.php"  ] && {
+	[ -e "$path/config/.env" ] && head -n 5 "$path/config/.env" | grep -q PROJECT_TYPE=cdep && {
+            echo "$path/project"
+            return 0
+	}
+
+        [ -d "$path/project" ] && [ -d "$path/config" ] && { [ -f "$path/config/app-config-local.php"  ] || [ -f "$path/config/.env" ]; }  && {
             echo "$path/project"
             return 0
         }
