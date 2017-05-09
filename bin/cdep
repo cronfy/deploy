@@ -209,11 +209,11 @@ function my() {
 function myd() {
     local project_root mysql_args
 
-    project_root="`findProjectRootAbove`"
-    if [ "$?" != 0 ] ; then
-        echo "project root not found" >&2
-        return 1
-    fi
+#    project_root="`findProjectRootAbove`"
+#    if [ "$?" != 0 ] ; then
+#        echo "project root not found" >&2
+#        return 1
+#    fi
 
     mysql_args="`getMysqlArgs "$project_root" `"
     if [ "$?" != 0 ] ; then
