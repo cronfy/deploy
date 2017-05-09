@@ -54,6 +54,16 @@ function skel() {
 function findProjectRootAbove() {
     local path="$PWD" c=0
     while [ "/" != "$path" ] ; do
+#	[ -e "$path/.env" ] && head -n 5 "$path/.env" | grep -q PROJECT_TYPE=cdep && {
+#            echo "$path"
+#            return 0
+#	}
+#
+#	[ -e "$path/project/.env" ] && head -n 5 "$path/project/.env" | grep -q PROJECT_TYPE=cdep && {
+#            echo "$path/project"
+#            return 0
+#	}
+
 	[ -e "$path/config/.env" ] && head -n 5 "$path/config/.env" | grep -q PROJECT_TYPE=cdep && {
             echo "$path/project"
             return 0
@@ -76,14 +86,18 @@ function findProjectRootAbove() {
     return 1
 }
 
-function findCdepRootAbove() {
+function getEnvDir() {
     local path="$PWD" c=0
     while [ "/" != "$path" ] ; do
-	[ -e "$path/config/.env" ] && head -n 5 "$path/config/.env" | grep -q PROJECT_TYPE=cdep && {
+	[ -e "$path/.env" ] && head -n 5 "$path/.env" | grep -q PROJECT_TYPE=cdep && {
             echo "$path"
             return 0
 	}
 
+	[ -e "$path/project/.env" ] && head -n 5 "$path/project/.env" | grep -q PROJECT_TYPE=cdep && {
+            echo "$path/project"
+            return 0
+	}
         c=$(($c + 1))
         [ 50 -lt "$c" ] && {
             echo "Too deep recursion." >&2
@@ -106,13 +120,13 @@ function getMysqlArgsFromDotEnv() {
 }
 
 function getEnvPath() {
-    cdep_root="`findCdepRootAbove`"
+    env_dir="`getEnvDir`"
     if [ "$?" != 0 ] ; then
-        echo "cdep root not found" >&2
+        echo "env dir not found" >&2
         return 1
     fi
 
-    local env="$cdep_root/config/.env"
+    local env="$env_dir/.env"
     [ -e "$env" ] && echo "$env" && return 0
     return 1
 }
@@ -122,7 +136,11 @@ function getMysqlArgs() {
     local config mysql_args
     local project_dir="`dirname "$project_root"`"
 
-    config="`find $project_dir/config -name '.env' -print -quit`"
+    config="`getEnvPath`"
+
+    if [ -z "$config" ] ; then
+        config="`find $project_dir/config -name '.env' -print -quit`"
+    fi
 
     if [ -z "$config" ] ; then
         config="`find $project_root/../config  -name '.env' -print -quit`"
@@ -163,11 +181,11 @@ function getMysqlArgs() {
 function my() {
     local project_root mysql_args
 
-    project_root="`findProjectRootAbove`"
-    if [ "$?" != 0 ] ; then
-        echo "project root not found" >&2
-        return 1
-    fi
+#    project_root="`findProjectRootAbove`"
+#    if [ "$?" != 0 ] ; then
+#        echo "project root not found" >&2
+#        return 1
+#    fi
 
     mysql_args="`getMysqlArgs "$project_root" `"
     if [ "$?" != 0 ] ; then
