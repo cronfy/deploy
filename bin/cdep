@@ -76,6 +76,26 @@ function findProjectRootAbove() {
     return 1
 }
 
+function findCdepRootAbove() {
+    local path="$PWD" c=0
+    while [ "/" != "$path" ] ; do
+	[ -e "$path/config/.env" ] && head -n 5 "$path/config/.env" | grep -q PROJECT_TYPE=cdep && {
+            echo "$path"
+            return 0
+	}
+
+        c=$(($c + 1))
+        [ 50 -lt "$c" ] && {
+            echo "Too deep recursion." >&2
+            return 1
+        }
+
+        path="`dirname "$path"`"
+    done
+
+    return 1
+}
+
 function getMysqlArgsFromDotEnv() {
 	local dotenv="$1"
 
@@ -83,6 +103,18 @@ function getMysqlArgsFromDotEnv() {
 		. $dotenv
 		echo "-u $DB_USER -h $DB_HOST -p$DB_PASS $DB_NAME"
 	)
+}
+
+function getEnvPath() {
+    cdep_root="`findCdepRootAbove`"
+    if [ "$?" != 0 ] ; then
+        echo "cdep root not found" >&2
+        return 1
+    fi
+
+    local env="$cdep_root/config/.env"
+    [ -e "$env" ] && echo "$env" && return 0
+    return 1
 }
 
 function getMysqlArgs() {
@@ -293,6 +325,12 @@ case $key in
         shift # past argument
     ;;
     *)
+        if [ -e "$BASE_DIR/src/cdep/plugins/$key.sh" ] ; then
+		. "$BASE_DIR/src/cdep/plugins/$key.sh"
+		shift
+		plugin "$@"
+		exit $?
+	fi
         echo "Unknown command" >&2
         exit 1
             # unknown option
